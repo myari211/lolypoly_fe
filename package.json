@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/icons": "^5.6.1",
+    "@heroui/react": "^2.7.4",
     "@heroui/system": "^2.4.11",
     "@heroui/theme": "^2.4.11",
     "@testing-library/dom": "^10.4.0",
@@ -19,6 +21,7 @@
     "react-scripts": "5.0.1",
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
+    "sweetalert2": "^11.17.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
