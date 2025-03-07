@@ -52,7 +52,7 @@ const NavBar = (props) => {
                             <img src="/image/logo.png" style={{ width: "150px" }} />
                         </div>
                         <div>
-                            {login == false ? (
+                            {login == false || !login ? (
                                 <>
                                     <Link to="/login">
                                         <Button type="primary" className="mr-1">Login</Button>

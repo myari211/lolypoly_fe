@@ -12,7 +12,6 @@ const Layouts = () => {
     const name = localStorage.getItem('first_name') + localStorage.getItem('last_name');
     const userId = localStorage.getItem('userId');
 
-    console.log(login, userId);
 
     useEffect(() => {
         // if(login == true) {

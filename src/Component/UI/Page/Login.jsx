@@ -1,19 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Input, Row, Flex } from "antd";
 import { handleInputChange } from "../../Configuration/Services/Form/formHelper";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchLogin } from '../../Configuration/Redux/Action/authAction';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const authState = useSelector(state => state.auth);
     const [formData, setFormData] = useState({});
+    const login = localStorage.getItem('LoginStatus');
 
     // console.log(formData);
+    useEffect(() => {
+        if(login || login == true) {
+            navigate('/');
+        }
+    }, [login]);
 
-    const handleLogin = () => {
-        dispatch(fetchLogin(formData));
+
+    const handleLogin = async () => {
+        const response = await dispatch(fetchLogin(formData));
+
+        if(response.data.status == true) {
+            navigate('/');
+        }
     }
 
     return(
