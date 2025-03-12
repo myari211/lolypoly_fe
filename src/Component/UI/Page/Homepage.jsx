@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { get } from '../../Configuration/Services/API/apiHelper';
-import { Card, Col, Row, Flex } from 'antd';
+import { Card, Col, Row, Flex, Tag } from 'antd';
 import ProductBadge from '../Molecules/ProductBadge';
 import { ModalPopUp } from '../../Configuration/Services/Alert/alertHelper';
-import Banner from '../Atom/Banner';
+import {HeroBanner as Banner, MiniBanner} from '../Atom/Banner';
 import ImageWithFallback, { RoudedImage } from '../Atom/Image';
+import { SwipperProduct } from '../Atom/Swiper';
+import { useNavigate } from 'react-router-dom';
+
 
 const Homepage = () => {
     const [productLoading, setProductLoading] = useState(false);
@@ -13,6 +16,7 @@ const Homepage = () => {
     const [categoryList, setCategoryList] = useState({});
     const [productHot, setProductHot] = useState({});
     const urlImage = process.env.REACT_APP_BASE_IMAGE;
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBanner = async() => {
@@ -85,6 +89,11 @@ const Homepage = () => {
         fetchProduct();
     }, []);
 
+    const handleProduct = (id) => {
+        navigate(`/product/details/${id}`);
+        console.log("handleProduct");
+    }
+
     return(
         <>
             {bannerList.length < 1 ? (
@@ -103,28 +112,26 @@ const Homepage = () => {
                 <p>Loading ...</p>
             ) : (
                 <Row justify="center" gutter={16} className="mt-2">
-                    <Col span={10}>
+                    <Col span={20}>
                         <Card>
                             <Row>
                                 <Col span={24}>
-                                    <p className="sub-title font-color">Kategori</p>
+                                    <Flex justify="space-between" align="center">
+                                        <p className="sub-title font-color" style={{ fontWeight: 600 }}>Kategori</p>
+                                        <p className="text-muted">Semua Kategori</p>
+                                    </Flex>
                                 </Col>
                             </Row>
-                            <Row gutter={16} className="mt-2" style={{ maxHeight: "250px", overflowX: "scroll", overflowY: "hidden"}}>
-                                <Flex align="center">
+                            <Row gutter={16} className="mt-2">
+                                <Flex align="center" justify="space-evenly">
                                     {categoryList.length > 0 && (categoryList.map(item => (
-                                        <Col span={5} className="mb-2" hoverable>
+                                        <Col span={2} className="mb-2" hoverable>
                                             <Row>
                                                 <Col span={24}>
                                                     <RoudedImage
                                                         src={urlImage + "/" + item.image_path}
                                                         alt={item.name}
                                                     />
-                                                    {/* <ImageWithFallback
-                                                        src={urlImage + "/" + item.image_path}
-                                                        alt={item.name}
-                                                        style={{ borderRadius: "200px" }}
-                                                    /> */}
                                                 </Col>
                                             </Row>
                                             <Row justify="center">
@@ -138,7 +145,7 @@ const Homepage = () => {
                             </Row>
                         </Card>
                     </Col>
-                    <Col span={10}>
+                    {/* <Col span={10}>
                         <Card>
                             <Row>
                                 <Col span={24}>
@@ -153,7 +160,7 @@ const Homepage = () => {
                                 )))}
                             </Row>
                         </Card>
-                    </Col>
+                    </Col> */}
                 </Row>
             )}
 
@@ -166,6 +173,14 @@ const Homepage = () => {
                     <>
                         <Row justify="center" className="mt-2">
                             <Col span={20}>
+                                <Row>
+                                    <Col span={24}>
+                                        <Flex justify="space-between" align="center">
+                                            <p className="sub-title font-color">Product</p>
+                                            <p>Semua Product</p>
+                                        </Flex>
+                                    </Col>
+                                </Row>
                                 <Row gutter={16}>
                                     {productList.map(item => (
                                         <Col span={4} className="mb-2">
@@ -175,9 +190,84 @@ const Homepage = () => {
                                 </Row>
                             </Col>
                         </Row>
-                        {/* {productList.map(item => (
-                            <li>{item.id}</li>
-                        ))} */}
+                        {bannerList.length < 1 ? (
+                            <p>Loading ...</p>
+                        ) : (
+                            <Row justify="center">
+                                <Col span={20}>
+                                    <img src={urlImage + "/" + bannerList[0].image_path} style={{ height: "200px", width: "100%" }} />
+                                </Col>
+                            </Row>
+                        )}
+                        <Row justify="center">
+                            <Col span={20}>
+                                <Row>
+                                    <Col span={24}>
+                                        <Flex justify="space-between" align="center">
+                                            <p className="sub-title font-color" style={{ fontWeight: 600}}>Produk Terbaru</p>
+                                            <p>Semua Produk</p>
+                                        </Flex>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <SwipperProduct props={productList} />
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row justify="center">
+                            <Col span={20}>
+                                <Row>
+                                    <Col span={24}>
+                                        <Flex justify="space-between" align="center">
+                                            <p className="sub-title font-color" style={{ fontWeight: 600}}>Produk Discount</p>
+                                            <p>Semua Produk</p>
+                                        </Flex>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <SwipperProduct props={productList} />
+                                </Row>
+                            </Col>
+                        </Row>
+                        {bannerList.length < 1 ? (
+                            <p>Loading ...</p>
+                        ) : (
+                            <Row justify="center" className="mt-2" style={{ height: "300px"}}>
+                                <Col span={20}>
+                                    <img src={urlImage + "/" + bannerList[0].image_path} style={{ height: "200px", width: "100%" }} />
+                                </Col>
+                            </Row>
+                        )}
+                        <Row justify="center">
+                            <Col span={20}>
+                                <Row>
+                                    <Col span={24}>
+                                        <Flex justify="space-between" align="center">
+                                            <p className="sub-title font-color" style={{ fontWeight: 600}}>Rekomendasi Produk</p>
+                                            <p>Semua Produk</p>
+                                        </Flex>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <SwipperProduct props={productList} />
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row justify="center">
+                            <Col span={20}>
+                                <Row>
+                                    <Col span={24}>
+                                        <Flex justify="space-between" align="center">
+                                            <p className="sub-title font-color" style={{ fontWeight: 600}}>Produk Terlaris</p>
+                                            <p>Semua Produk</p>
+                                        </Flex>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <SwipperProduct props={productList} />
+                                </Row>
+                            </Col>
+                        </Row>
                     </>
                 )
             ) : (

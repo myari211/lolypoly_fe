@@ -3,6 +3,7 @@
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { routesConfig } from "./Component/Configuration/Routes/Routes";
+import 'swiper/css/bundle';
 
 // function App() {
 //   return (
