@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { fetchProduct, fetchProductDetails } from '../../Configuration/Redux/Action/productDetailsAction';
-import { Row, Col, Card, Carousel, Tabs, Button, Flex } from 'antd';
+import { Row, Col, Card, Carousel, Tabs, Button, Flex, Tag } from 'antd';
 import { get } from '../../Configuration/Services/API/apiHelper';
 import { formatRupiah } from '../../Configuration/Services/Number/numberHelper';
+import { MessageOutlined, ShareAltOutlined } from '@ant-design/icons';
 
 const { TabPane } = Tabs;
 
@@ -100,95 +101,104 @@ const ProductDetails = () => {
         <>
             {!loading ? (
             // <Layout>
-                <Row className="mt-4" gutter={24}>
-                    <Col span={8}>
-                        <Row justify="center">
-                            <Col span={16}>
-                                <div style={{ marginBottom: '20px' }}>
-                                    <img 
-                                    src={selectedImage} 
-                                    alt="Main Product Image" 
-                                    className="rounded"
-                                    style={{ width: '400px', height: 'auto', height: '400px', objectFit: 'contain' }} 
-                                    />
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row justify="center">
-                            <Col span={16}>
-                                <Row justify="center" gutter={8}>
-                                    {data?.images?.map(image => (
-                                        <Col span={6} className="mb-2">
-                                            <img src={url + "/" + image.image_path}
-                                                onClick={() => handleImageClick(`${url}/${image.image_path}`)}
-                                                style={{ width: "100px", height: "100px", objectFit: 'cover', cursor: 'pointer', }}
-                                                className="bordered rounded"
+                <Row className="mt-4" gutter={16}>
+                    <Col span={6}>
+                        <Card>
+                            <Row justify="center">
+                                <Col span={12}>
+                                    <Flex justify="center">
+                                        <div style={{ marginBottom: '20px' }}>
+                                            <img 
+                                            src={selectedImage} 
+                                            alt="Main Product Image" 
+                                            className="rounded"
+                                            style={{ width: '250px', height: 'auto', height: '250px', objectFit: 'contain' }} 
                                             />
-                                        </Col>
-                                    ))}
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Col>
-                    <Col span={8}>
-                        <Row>
-                            <Col>
-                                <h3>{data.name}</h3>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <h2>{formatRupiah(data.price)}</h2>
-                                {/* <h2>{data.price}</h2> */}
-                            </Col>
-                        </Row>
-                        <Tabs defaultActiveKey='1'>
-                            <TabPane tab="Description" key="1">
-                                <Row>
-                                    <Col>
-                                        <div dangerouslySetInnerHTML={{ __html: data.description }} />
-                                    </Col>
-                                </Row>
-                            </TabPane>
-                            <TabPane tab="Spesification" key="2">
-                                <Row>
-                                    <Col span={24}>
-                                        <h5>Category</h5>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col span={24}>
-                                        {data?.category?.map(category => (
-                                            <h4>{category.name}</h4>
+                                        </div>
+                                    </Flex>
+                                </Col>
+                            </Row>
+                            <Row justify="center" className="mt-1">
+                                <Col span={16}>
+                                    <Row gutter={8} justify="center">
+                                        {data?.images?.map(image => (
+                                            <Col className="mb-2">
+                                                <img src={url + "/" + image.image_path}
+                                                    onClick={() => handleImageClick(`${url}/${image.image_path}`)}
+                                                    style={{ width: "50px", height: "50px", objectFit: 'cover', cursor: 'pointer', border: '1px solid #abe'}}
+                                                    className="bordered rounded"
+                                                />
+                                            </Col>
                                         ))}
-                                    </Col>
-                                </Row>
-                                <Row className="mt-3">
-                                    <Col span={24}>
-                                        <h5>Merk</h5>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col span={24}>
-                                        <h4>Samsung, Apple, Android, Universal</h4>
-                                    </Col>
-                                </Row>
-                                <Row className="mt-3">
-                                    <Col span={24}>
-                                        <h5>Store</h5>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col span={24}>
-                                        <h4>Available</h4>
-                                    </Col>
-                                </Row>
-                            </TabPane>
-                        </Tabs>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Card>
+                    </Col>
+                    <Col span={10}>
+                        <Card>
+                            <Row>
+                                <Col span={24}>
+                                    <h3>{data.name}</h3>
+                                    {data.discount_price != 0 && (
+                                        <Tag>Hot Deal</Tag>
+                                    )}
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col>
+                                    <h2>{formatRupiah(data.price)}</h2>
+                                    {/* <h2>{data.price}</h2> */}
+                                </Col>
+                            </Row>
+                            <Tabs defaultActiveKey='1'>
+                                <TabPane tab="Description" key="1">
+                                    <Row>
+                                        <Col>
+                                            <div dangerouslySetInnerHTML={{ __html: data.description }} />
+                                        </Col>
+                                    </Row>
+                                </TabPane>
+                                <TabPane tab="Spesification" key="2">
+                                    <Row>
+                                        <Col span={24}>
+                                            <h5 className="font-color">Category</h5>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={24}>
+                                            {data?.category?.map(category => (
+                                                <h4>{category.name}</h4>
+                                            ))}
+                                        </Col>
+                                    </Row>
+                                    <Row className="mt-3">
+                                        <Col span={24}>
+                                            <h5 className="font-color">Merk</h5>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={24}>
+                                            <h4>Samsung, Apple, Android, Universal</h4>
+                                        </Col>
+                                    </Row>
+                                    <Row className="mt-3">
+                                        <Col span={24}>
+                                            <h5 className="font-color">Store</h5>
+                                        </Col>
+                                    </Row>
+                                    <Row>
+                                        <Col span={24}>
+                                            <h4>Available</h4>
+                                        </Col>
+                                    </Row>
+                                </TabPane>
+                            </Tabs>
+                        </Card>
                     </Col>
                     <Col span={8}>
                         <Row justify="center">
-                            <Col span={18}>
+                            <Col span={20}>
                                 <Card>
                                     <Row>
                                         <Col span={24}>
@@ -212,7 +222,9 @@ const ProductDetails = () => {
                                     </Row>
                                     <Row className="mt-4">
                                         <Col span={24}>
-                                            <Button type="primary" size="lg" block className="button">Add to cart</Button>
+                                            <Button type="primary" size="lg" block className="button">
+                                                Add To Cart
+                                            </Button>
                                         </Col>
                                     </Row>
                                     <Row className="mt-1">
@@ -220,15 +232,15 @@ const ProductDetails = () => {
                                             <Button type="primary" size="lg" block ghost className="button">Checkout</Button>
                                         </Col>
                                     </Row>
-                                    <Row className="mt-5">
+                                    <Row className="mt-5" gutter={16}>
                                         <Col span={12}>
                                             <Flex justify='center'>
-                                                <Button size="sm">Chat</Button>
+                                                <Button size="large" icon={<MessageOutlined />} block style={{ border: "none"}} />
                                             </Flex>
                                         </Col>
                                         <Col span={12}>
                                             <Flex justify="center">
-                                                <Button size="sm">Share</Button>
+                                                <Button size="large" icon={<ShareAltOutlined />} block style={{ border: "none" }} />
                                             </Flex>
                                         </Col>
                                     </Row>
