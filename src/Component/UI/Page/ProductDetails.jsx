@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { fetchProduct, fetchProductDetails } from '../../Configuration/Redux/Action/productDetailsAction';
-import { Row, Col, Card, Carousel, Tabs, Button, Flex, Tag } from 'antd';
+import { Row, Col, Card, Carousel, Tabs, Button, Flex, Tag, Typography } from 'antd';
 import { get } from '../../Configuration/Services/API/apiHelper';
 import { formatRupiah } from '../../Configuration/Services/Number/numberHelper';
-import { MessageOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { MessageOutlined, ShareAltOutlined, FireFilled, StarFilled, ShoppingFilled } from '@ant-design/icons';
+import { ModalPopUp } from '../../Configuration/Services/Alert/alertHelper';
 
 const { TabPane } = Tabs;
+const { Text } = Typography;
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -15,18 +17,11 @@ const ProductDetails = () => {
     const productState = useSelector(state => state.productDetails);
     const data = productState.data;
     const loading = productState.loading;
-    console.log(productState);
+    const login = localStorage.getItem('LoginStatus');
 
     useEffect(() => {
         const getProductDetails = () => {
             dispatch(fetchProduct(id));
-
-            // if(response.data.status == true) {
-            //     setData(response.data.data);
-            // }
-            // else {
-            //     setData({});
-            // }
         }
 
         getProductDetails();
@@ -82,21 +77,31 @@ const ProductDetails = () => {
         }
     
         const handleAddCounter = () => {
-        if(counter > data?.stock) {
-            return alert('Stock not available');
+            if(counter > data?.stock) {
+                return alert('Stock not available');
+            }
+        
+            setCounter(counter + 1);
+            }
+        
+            const handleMinusCounter = () => {
+            if(counter < 1) {
+                return alert('Minimum order 1');
+            }
+        
+            setCounter(counter - 1);
         }
-    
-        setCounter(counter + 1);
+
+        const checkLogin = () => {
+            if(!login) {
+                ModalPopUp("You have login first!", "info");
+            }
         }
-    
-        const handleMinusCounter = () => {
-        if(counter < 1) {
-            return alert('Minimum order 1');
+        
+        const handleCheckout = () => {
+            checkLogin();
         }
-    
-        setCounter(counter - 1);
-        }
-    
+
         return (
         <>
             {!loading ? (
@@ -139,16 +144,27 @@ const ProductDetails = () => {
                         <Card>
                             <Row>
                                 <Col span={24}>
-                                    <h3>{data.name}</h3>
+                                    <h2>{data.name}</h2>
                                     {data.discount_price != 0 && (
-                                        <Tag>Hot Deal</Tag>
+                                        <Tag color="#f50" icon={<FireFilled />} style={{ borderRadius: "20px"}}>Hot Deal</Tag>
+                                    )}
+                                    {data.newest != 0 && (
+                                        <Tag color="#108ee9" icon={<StarFilled />} style={{ borderRadius: "20px" }}>Newest</Tag>
                                     )}
                                 </Col>
                             </Row>
                             <Row>
                                 <Col>
-                                    <h2>{formatRupiah(data.price)}</h2>
-                                    {/* <h2>{data.price}</h2> */}
+                                    {
+                                        data.discount_price != 0 ? (
+                                            <Flex align="center">
+                                                <h2>{formatRupiah(data.discount_price)}</h2>
+                                                <Text delete className="ml-1">{formatRupiah(data.price)}</Text>
+                                            </Flex>
+                                        ) : (
+                                            <h2>{formatRupiah(data.price)}</h2>
+                                        )
+                                    }
                                 </Col>
                             </Row>
                             <Tabs defaultActiveKey='1'>
@@ -222,14 +238,14 @@ const ProductDetails = () => {
                                     </Row>
                                     <Row className="mt-4">
                                         <Col span={24}>
-                                            <Button type="primary" size="lg" block className="button">
-                                                Add To Cart
+                                            <Button type="primary" size="lg" block className="button" icon={<ShoppingFilled style={{ color: "white" }} />} onClick={handleCheckout}>
+                                                Checkout
                                             </Button>
                                         </Col>
                                     </Row>
                                     <Row className="mt-1">
                                         <Col span={24}>
-                                            <Button type="primary" size="lg" block ghost className="button">Checkout</Button>
+                                            <Button type="primary" size="lg" block ghost className="button">Add To Cart</Button>
                                         </Col>
                                     </Row>
                                     <Row className="mt-5" gutter={16}>

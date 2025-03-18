@@ -20,7 +20,7 @@ export const ModalPopUp = (text, icon) => {
         position: 'top-end',
         showConfirmButton: false,
         html: formattedMessages,
-        timer: 10000, //10s
+        timer: 5000, //5s
         timerProgressBar: true,
         icon: icon, // success, error, warning, info, question
     });
