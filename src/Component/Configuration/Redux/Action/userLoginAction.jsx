@@ -34,7 +34,9 @@ export const fetchUserInformation = (id) => {
 
             if(response.data.status == true) {
                 dispatch(fetchUserInformationSuccess(response.data.data));
-                return response;
+                // return response;
+
+                console.log("Profile Test", response);
             }
             else {
                 dispatch(fetchUserInformationFailure(response));

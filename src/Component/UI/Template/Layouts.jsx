@@ -21,20 +21,20 @@ const Layouts = () => {
 
             checkLogin();
         }
-        else {
-            const deleteUserStatus = () => {
-                localStorage.removeItem("LoginStatus");
-                localStorage.removeItem("PosID");
-                localStorage.removeItem("firstName");
-                localStorage.removeItem("first_name");
-                localStorage.removeItem("last_name");
-                localStorage.removeItem("token");
-                localStorage.removeItem("userId");
-                localStorage.removeItem("email");
-            }
+        // else {
+        //     const deleteUserStatus = () => {
+        //         localStorage.removeItem("LoginStatus");
+        //         localStorage.removeItem("PosID");
+        //         localStorage.removeItem("firstName");
+        //         localStorage.removeItem("first_name");
+        //         localStorage.removeItem("last_name");
+        //         localStorage.removeItem("token");
+        //         localStorage.removeItem("userId");
+        //         localStorage.removeItem("email");
+        //     }
 
-            deleteUserStatus();
-        }
+        //     deleteUserStatus();
+        // }
     }, [login]);
 
     return(
