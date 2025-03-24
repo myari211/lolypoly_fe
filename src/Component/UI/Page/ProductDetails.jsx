@@ -7,6 +7,7 @@ import { get } from '../../Configuration/Services/API/apiHelper';
 import { formatRupiah } from '../../Configuration/Services/Number/numberHelper';
 import { MessageOutlined, ShareAltOutlined, FireFilled, StarFilled, ShoppingFilled } from '@ant-design/icons';
 import { ModalPopUp } from '../../Configuration/Services/Alert/alertHelper';
+import { updateQuantity } from '../../Configuration/Redux/Action/productSlice';
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
@@ -15,6 +16,7 @@ const ProductDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const productState = useSelector(state => state.productDetails);
+    const product = useSelector((state) => state.products[id]);
     const data = productState.data;
     const loading = productState.loading;
     const login = localStorage.getItem('LoginStatus');
@@ -77,19 +79,20 @@ const ProductDetails = () => {
         }
     
         const handleAddCounter = () => {
-            if(counter > data?.stock) {
-                return alert('Stock not available');
+            if(product.quantity > data.stock) {
+                ModalPopUp("Stock is not available", 'warning');
+            }
+
+            dispatch(updateQuantity(id, product.quantity + 1));
+        }
+        
+        const handleMinusCounter = () => {
+            if(product.quantity < 1) {
+                ModalPopUp("Minimum Order 1", 'warning');
             }
         
-            setCounter(counter + 1);
-            }
-        
-            const handleMinusCounter = () => {
-            if(counter < 1) {
-                return alert('Minimum order 1');
-            }
-        
-            setCounter(counter - 1);
+            // setCounter(counter - 1);
+            dispatch(updateQuantity(id, product.quantity - 1));
         }
 
         const checkLogin = () => {
@@ -101,6 +104,8 @@ const ProductDetails = () => {
         const handleCheckout = () => {
             checkLogin();
         }
+
+        console.log(product);
 
         return (
         <>
