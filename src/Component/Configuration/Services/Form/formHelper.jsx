@@ -6,9 +6,24 @@ export const handleInputChange = (setFormData, formData) => (e) => {
     });
 }
 
-export const handleMultiSelectChange = (selectedOptions, name, setFormData, formData) => {
-    setFormData({
-        ...formData,
-        [name.name]: selectedOptions,
-    });
+// export const handleMultiSelectChange = (selectedOptions, name, setFormData, formData) => {
+export const handleMultiSelectChange = (setFormData, formData) => (selectedOptions, name) => {
+    // setFormData({
+    //     ...formData,
+    //     [name]: selectedOptions,
+    // });
+    setFormData((prevData) => ({
+        ...prevData,
+        [name]: selectedOptions,
+      }));
+
+    // console.log("testing name", name);
 }
+
+export const handleCheckboxChange = (setFormData, formData) => (e) => {
+    const { name, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: checked,
+    });
+  };

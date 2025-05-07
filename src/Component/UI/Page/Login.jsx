@@ -25,7 +25,18 @@ const Login = () => {
         const response = await dispatch(fetchLogin(formData));
 
         if(response.data.status == true) {
-            navigate('/');
+            const data = response.data.data;
+            // console.log("user", data.user.roles[0]);
+
+            if(data.user.roles[0].name == "user") {
+                navigate('/');
+            }
+            else if(data.user.roles[0].name == "admin") {
+                navigate('/admin/dashboard');
+            }
+            else if(data.user.roles[0].name == 'Admin-Stock') {
+                navigate('/admin_product/dashboard');
+            }
         }
     }
 

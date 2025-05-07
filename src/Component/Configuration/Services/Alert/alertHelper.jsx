@@ -25,3 +25,20 @@ export const ModalPopUp = (text, icon) => {
         icon: icon, // success, error, warning, info, question
     });
 }
+
+export const showErrorToasts = (errorObj) => {
+    if (typeof errorObj === 'string') {
+      ModalPopUp(errorObj, 'error');
+      return;
+    }
+  
+    if (typeof errorObj === 'object') {
+      Object.values(errorObj).flat().forEach((msg, index) => {
+        setTimeout(() => {
+          ModalPopUp(msg, 'error');
+        }, index * 500); // biar ga numpuk semua sekaligus
+      });
+    } else {
+      ModalPopUp('An unexpected error occurred.', 'error');
+    }
+  };

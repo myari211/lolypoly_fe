@@ -352,3 +352,18 @@ code {
   color: #4395d1;
 }
 
+@keyframes spin3D {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg); /* Bisa diganti -360deg untuk arah berlawanan */
+  }
+}
+
+.loader3D {
+  width: 250px;
+  height: auto;
+  animation: spin3D 1.5s linear infinite;
+  transform-style: preserve-3d;
+}

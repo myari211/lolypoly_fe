@@ -17,6 +17,7 @@ const Homepage = () => {
     const [productHot, setProductHot] = useState({});
     const urlImage = process.env.REACT_APP_BASE_IMAGE;
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchBanner = async() => {

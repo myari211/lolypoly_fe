@@ -15,13 +15,17 @@ const Product = ({ props }) => {
             <Card 
                 style={{ height: "100%", padding: 0 }} 
                 hoverable 
-                cover= {props.images.map(item => (
-                    // <img src={baseImage + "/" + item.image_path} style={{ width: "100%" }} />
-                    <SquareImage
-                        src={baseImage + "/" + item.image_path}
-                        alt={props.name}
-                    />
-                ))}
+                cover={
+                    (() => {
+                      const bannerImage = props.images.find(item => item.banner == 1);
+                      return bannerImage ? (
+                        <SquareImage
+                          src={baseImage + "/" + bannerImage.image_path}
+                          alt={props.name}
+                        />
+                      ) : null;
+                    })()
+                }
             >
                     <Row className="mt-1">
                         <Col span={24}>

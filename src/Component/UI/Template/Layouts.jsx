@@ -4,14 +4,18 @@ import { Outlet } from "react-router-dom"
 import NavBar from "../Atom/NavBar";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserInformation } from '../../Configuration/Redux/Action/userLoginAction';
+import SideNav from '../Atom/SideNav';
+import { post } from '../../Configuration/Services/API/apiHelper';
 
 const Layouts = () => {
     const dispatch = useDispatch();
     const profile = useSelector(state => state.profile)
     const login = localStorage.getItem('LoginStatus');
-    const name = localStorage.getItem('first_name') + localStorage.getItem('last_name');
+    const name = localStorage.getItem('first_name') +" "+ localStorage.getItem('last_name');
     const userId = localStorage.getItem('userId');
-
+    const role = atob(localStorage.getItem("role"));
+    const [navigation, setNavigation] = useState({});
+    const [loadingMenu, setLoadingMenu] = useState(false);
 
     useEffect(() => {
         if(login == true) {
@@ -37,18 +41,72 @@ const Layouts = () => {
         // }
     }, [login]);
 
+    useEffect(() => {
+        const getNavigation = async() => {
+            const data = {
+                "role": role,
+            }
+
+            const response = await post(data, '/ecommerce/navigation/list');
+            setLoadingMenu(true);
+
+            if(response.data.status == true) {
+                setNavigation(response.data.data);
+            }
+
+            setLoadingMenu(false);
+            // console.log(response, "Ini Menu");
+        }
+
+        getNavigation();
+    }, []);
+
+    // console.log(navigation);
+
     return(
         <>
-            <Row>
-                <Col span={24}>
-                    <NavBar
-                        login={login}
-                        name={name}
-                        profile={profile}
-                    />
-                </Col>
-            </Row>
-            <Outlet />
+            {role == 'admin' || role == 'Admin-Stock' ? (
+                <>
+                    <Row>
+                        <Col span={24}>
+                            <NavBar 
+                                login={login}
+                                name={name}
+                                profile={profile}
+                            />
+                        </Col>
+                    </Row>
+                    <Row className="mt-2" gutter={16}>
+                        <Col span={4}>
+                            {/* <SideNav
+                                data={navigation}
+                            /> */}
+                            {navigation && navigation.length > 0 && (
+                                <SideNav 
+                                    data={navigation} 
+                                    loading={loadingMenu}
+                                />
+                            )}
+                        </Col>
+                        <Col span={18}>
+                            <Outlet />
+                        </Col>    
+                    </Row>
+                </>
+            ) : (
+                <>
+                    <Row>
+                        <Col span={24}>
+                            <NavBar
+                                login={login}
+                                name={name}
+                                profile={profile}
+                            />
+                        </Col>
+                    </Row>
+                    <Outlet />
+                </>
+            )}
         </>
     )
 }

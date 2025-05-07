@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { fetchProduct, fetchProductDetails } from '../../Configuration/Redux/Action/productDetailsAction';
-import { Row, Col, Card, Carousel, Tabs, Button, Flex, Tag, Typography } from 'antd';
-import { get } from '../../Configuration/Services/API/apiHelper';
+import { Row, Col, Card, Carousel, Tabs, Button, Flex, Tag, Typography, Image } from 'antd';
+import { get, post } from '../../Configuration/Services/API/apiHelper';
 import { formatRupiah } from '../../Configuration/Services/Number/numberHelper';
 import { MessageOutlined, ShareAltOutlined, FireFilled, StarFilled, ShoppingFilled } from '@ant-design/icons';
-import { ModalPopUp } from '../../Configuration/Services/Alert/alertHelper';
+import { ModalPopUp, showErrorToasts } from '../../Configuration/Services/Alert/alertHelper';
 import { updateQuantity } from '../../Configuration/Redux/Action/productSlice';
+import LoadingImage from '../Molecules/Loading';
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
@@ -16,7 +17,10 @@ const ProductDetails = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const productState = useSelector(state => state.productDetails);
-    const product = useSelector((state) => state.products[id]);
+    // const product = useSelector((state) => state.products[id]);
+    const product = useSelector((state) => state.products);
+    const navigate = useNavigate();
+
     const data = productState.data;
     const loading = productState.loading;
     const login = localStorage.getItem('LoginStatus');
@@ -29,39 +33,43 @@ const ProductDetails = () => {
         getProductDetails();
     }, []);
 
+    console.log(data.images);
+
     // const [data, setData] = useState({});
     // const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(null);
     const [counter, setCounter] = useState(1);
-    const [subTotal, setSubTotal] = useState(0);
     const [cartTrigger, setCartTrigger] = useState(0);
     const [cart, setCart] = useState(0);
+    const [quantity, setQuantity] = useState(1);
+    const price = data?.discount_percentage != 0 ? data?.discount_price : data?.price;
+    const [subTotal, setSubTotal] = useState(price);
     const url = "http://localhost:8000";
     const userId = localStorage.getItem('userId');
+    const [buttonCheckoutLoading, setButtonCheckoutLoading] = useState(false);
 
-    // useEffect(() => {
-    //     const fetchProductDetails = async() => {
-    //         setLoading(true);
-    //         const address = `${url}/api/ecommerce/product/details/${id}`;
-    
-    //         const response = await get(address);
-    
-    //         setData(response.data);
-    //         setSelectedImage(`${url}/${response.data.images[0].image_path}`);
-    //         setSubTotal(response.data.price);
-    //         setLoading(false);
-    //     }
-    
-    //     fetchProductDetails();
-    // }, [id]);
+    console.log(price);
+
+    useEffect(() => {
+        if (data?.images?.length > 0 && !selectedImage) {
+          setSelectedImage(`${url}/${data.images[0].image_path}`);
+        }
+      }, [data, selectedImage]);
+
+    useEffect(() => {
+    // Reset image saat ganti product ID
+        setSelectedImage(null);
+        setQuantity(1);
+    }, [id]);
+
 
     useEffect(() => {
         const handleSubTotal = () => {
-          setSubTotal(data.price * counter);
+          setSubTotal(price * quantity);
         }
 
     handleSubTotal();
-    }, [counter]);
+    }, [loading, quantity]);
     
         // useEffect(() => {
         // const fetchCart = async() => {
@@ -79,20 +87,21 @@ const ProductDetails = () => {
         }
     
         const handleAddCounter = () => {
-            if(product.quantity > data.stock) {
+            if(quantity > data.stock) {
                 ModalPopUp("Stock is not available", 'warning');
             }
-
-            dispatch(updateQuantity(id, product.quantity + 1));
+            else {
+                setQuantity(quantity + 1);
+            }
         }
         
         const handleMinusCounter = () => {
-            if(product.quantity < 1) {
+            if(quantity < 1) {
                 ModalPopUp("Minimum Order 1", 'warning');
             }
-        
-            // setCounter(counter - 1);
-            dispatch(updateQuantity(id, product.quantity - 1));
+            else {
+                setQuantity(quantity - 1);
+            }
         }
 
         const checkLogin = () => {
@@ -101,11 +110,38 @@ const ProductDetails = () => {
             }
         }
         
-        const handleCheckout = () => {
+        const handleCheckout = async () => {
             checkLogin();
+
+            const form = {
+                product_id: id,
+                user_id: userId,
+                quantity: quantity,
+                price: subTotal,
+            }
+
+            try {
+                setButtonCheckoutLoading(true);
+                const response = await post(form, '/user/transaction/create');
+
+                if(response.data.status == true) {
+                    // ModalPopUp("Transaction Created", 'success');
+                    const url = '/user/transaction/' + response.data.data.id;
+                    navigate(url);
+                    
+                }
+                else {
+                    showErrorToasts(response.data.message);
+                }
+
+                setButtonCheckoutLoading(false);
+            }
+            catch(error) {
+                showErrorToasts(error);
+            }
         }
 
-        console.log(product);
+        const imageItems = data?.images?.map(image => `${url}/${image.image_path}`) || [];
 
         return (
         <>
@@ -118,12 +154,11 @@ const ProductDetails = () => {
                                 <Col span={12}>
                                     <Flex justify="center">
                                         <div style={{ marginBottom: '20px' }}>
-                                            <img 
-                                            src={selectedImage} 
-                                            alt="Main Product Image" 
-                                            className="rounded"
-                                            style={{ width: '250px', height: 'auto', height: '250px', objectFit: 'contain' }} 
-                                            />
+                                            <Image.PreviewGroup
+                                                items={imageItems}
+                                            >
+                                                <Image src={selectedImage} className="rounded" width={250} />
+                                            </Image.PreviewGroup>
                                         </div>
                                     </Flex>
                                 </Col>
@@ -226,7 +261,7 @@ const ProductDetails = () => {
                                             <Flex justify="space-between" align="center">
                                                 <div>
                                                     <Button onClick={() => handleMinusCounter()}>-</Button>
-                                                    <span className="ml-2 mr-2">{counter}</span>
+                                                    <span className="ml-2 mr-2">{quantity}</span>
                                                     <Button onClick={() => handleAddCounter() }>+</Button>
                                                 </div>
                                                 <span>Stock: {data.stock} </span>
@@ -243,7 +278,7 @@ const ProductDetails = () => {
                                     </Row>
                                     <Row className="mt-4">
                                         <Col span={24}>
-                                            <Button type="primary" size="lg" block className="button" icon={<ShoppingFilled style={{ color: "white" }} />} onClick={handleCheckout}>
+                                            <Button type="primary" size="lg" block className="button" icon={<ShoppingFilled style={{ color: "white" }} />} onClick={handleCheckout} loading={buttonCheckoutLoading}>
                                                 Checkout
                                             </Button>
                                         </Col>
@@ -272,7 +307,7 @@ const ProductDetails = () => {
                 </Row>
             // </Layout>
             ) : (
-                "Loading"
+                <LoadingImage />
             )}
         </>
         );

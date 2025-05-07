@@ -36,12 +36,15 @@ export const fetchLogin = (data) => {
 
             if(response?.data?.status != false) {
                 dispatch(fetchSendLoginSuccess(response.data))
+                const role = btoa(response.data.data.user.roles[0].name);
+
                 localStorage.setItem("userId", response.data.data.user.id);
                 localStorage.setItem("first_name", response.data.data.user.first_name);
                 localStorage.setItem("last_name", response.data.data.user.last_name);
                 localStorage.setItem("token", response.data.data.token);
                 localStorage.setItem("email", response.data.data.user.email);
                 localStorage.setItem("PosID", response.data.data.user.deal_pos_id);
+                localStorage.setItem("role", role);
                 localStorage.setItem("LoginStatus", true);
             }
             else {
