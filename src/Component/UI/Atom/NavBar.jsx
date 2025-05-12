@@ -4,6 +4,7 @@ import { Avatar, Dropdown } from 'antd';
 import { UserOutlined } from "@ant-design/icons";
 import { useEffect, useState } from 'react';
 import { post } from "../../Configuration/Services/API/apiHelper";
+import LoadingImage from "../Molecules/Loading";
 
 const NavBar = (props) => {
     const [loginState, setLoginState] = useState(null);
@@ -18,14 +19,7 @@ const NavBar = (props) => {
 
     console.log("loginState", loginState);
 
-    const handleLogout = async() => {
-        const response = await post({}, '/logout');
-
-        if(response.data.success == true) {
-            localStorage.clear();
-            navigate('/');
-        }
-    }
+   
 
     const items = [
         {
@@ -59,7 +53,7 @@ const NavBar = (props) => {
         {
             key: '4',
             label: (
-                <a onClick={() => handleLogout()}>
+                <a onClick={props.handleLogout}>
                     Log Out
                 </a>
             ),
@@ -68,6 +62,7 @@ const NavBar = (props) => {
 
     return(
         <>
+        {!props.loading ? (
             <Row justify="center">
                 <Col span={24} style={{ minHeight: "75px", backgroundColor: "white" }} className="border pr-2 pl-2">
                     <Flex justify="space-between" align="center" style={{ height: "100%"}}>
@@ -114,6 +109,9 @@ const NavBar = (props) => {
                     </Flex>
                 </Col>
             </Row>
+            ) : (
+                <LoadingImage />
+            )}
         </>
     )
 }

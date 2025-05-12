@@ -18,7 +18,7 @@ const TableAtom = (props) => {
             render: (_, {id}) => (
                 <>
                     <Button type="primary" warning onClick={() => props.handleEdit(id)}>Update</Button>
-                    <Button type="primary" className="ml-1" danger>Delete</Button>
+                    <Button type="primary" className="ml-1" danger onClick={() => props.handleDelete(id) }>Delete</Button>
                 </>
             )
           }
@@ -112,7 +112,7 @@ const TableAtom = (props) => {
 
     return(
         <>
-          {props.form != false && (
+          {(props.form != false && props.addButton != false) && (
             <Row justify="flex-end">
               {/* <Col> */}
                 <Button type="primary" onClick={props.openModal}>Add {props.title}</Button>

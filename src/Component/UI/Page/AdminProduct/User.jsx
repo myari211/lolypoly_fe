@@ -3,64 +3,69 @@ import { get } from '../../../Configuration/Services/API/apiHelper';
 import TableAtom from '../../Atom/TableAtom';
 import { Tag } from 'antd';
 import { handleInputChange } from '../../../Configuration/Services/Form/formHelper';
+import { ModalPopUp } from '../../../Configuration/Services/Alert/alertHelper';
 
 
 const User = () => {
     const [loading, setLoading] = useState(true);
-    const [userData, setUserData] = useState({});
+    const [userData, setUserData] = useState([]);
     const [formOpen, setFormOpen] = useState(false);
     const [formData, setFormData] = useState({});
     const [roleOption, setRoleOption] = useState({});
+    const [modalStatus, setModalStatus] = useState("create");
 
-    // useEffect(() => {
-    //     const getUser = async() => {
-    //         try {
-    //             setLoading(true);
-    //             const response = await get([], "/admin/user/user_list");
+    useEffect(() => {
+        const getUser = async() => {
+            try {
+                setLoading(true);
+                const response = await get([], "/admin/user/user_list");
 
-    //             if(response.data.status == true) {
-    //                 setUserData(response.data.data);
-    //             }
+                if(response.data.status == true) {
+                    setUserData(response.data.data);
+                }
 
-    //             setLoading(false);
-    //         }
-    //         catch(error) {
-    //             setLoading(false);
-    //             console.log(error);
-    //         }
-    //     }
+                setLoading(false);
+            }
+            catch(error) {
+                setLoading(false);
+                console.log(error);
+            }
+        }
 
-    //     getUser();
-    // }, []);
+        getUser();
+    }, []);
 
-    // useEffect(() => {
-    //     const getRoleOption = async() => {
-    //         const response = await get([], '/admin/role/list');
+    useEffect(() => {
+        const getRoleOption = async() => {
+            const response = await get([], '/admin/role/list');
 
-    //         if(response.data.status == true) {
-    //             const options = response.data.data.map((item) => ({
-    //                 value: item.id,
-    //                 label: item.name,
-    //             }));
+            if(response.data.status == true) {
+                const options = response.data.data.map((item) => ({
+                    value: item.id,
+                    label: item.name,
+                }));
 
-    //             setRoleOption(options);
-    //         }
-    //     }
+                setRoleOption(options);
+            }
+        }
 
-    //     getRoleOption();
-    // }, []);
+        getRoleOption();
+    }, []);
 
     const data = !loading ? userData.map(item => {
         return {
+            id: item.id,
             key: item.id,
             first_name: item.first_name,
             last_name: item.last_name,
-            role_name: item.role_name,
+            role_name: item.roles.map((data) => data.name),
             // navigation: item.navigation.map(child => child.navigation).join(', ')
         }
     })
     : 
     [];
+
+    console.log("data", userData);
 
     const columns = [
         {
@@ -130,14 +135,41 @@ const User = () => {
     ];
 
     const openModal = () => {
+        setModalStatus("create");
         setFormOpen(true);
     }
 
     const closeModal = () => {
+        setModalStatus("create");
         setFormOpen(false);
     }
 
-    console.log(formData);
+    const handleEdit = (id) => {
+        // return ModalPopUp(id, "success");
+        console.log("id", id);
+        setModalStatus("update");
+
+        const dataInit = userData;
+
+        console.log("dataInit", dataInit);
+
+        // console.log("Type of userData:", Array.isArray(userData));
+        // // console.log("UserData", userData.find(item => item.id == id));
+        // console.log("userDataReal", userData);
+        // console.log("userData", userData[0]);
+
+        // console.log("filter", filter);
+
+        // setFormData({
+        //     first_name: filterData.first_name,
+        //     last_name: filterData.last_name,
+        //     email: filterData.email,
+        // });
+
+        // setFormOpen(true);
+    }
+
+    console.log("dataEnd", userData);
     
     return(
         <>
@@ -152,6 +184,8 @@ const User = () => {
                 form={form}
                 formData={formData}
                 setFormData={setFormData}
+                modalStatus={modalStatus}
+                handleEdit={handleEdit}
             />
         </>
     )

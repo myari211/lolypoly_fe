@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Col, Flex, Row } from "antd";
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import NavBar from "../Atom/NavBar";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserInformation } from '../../Configuration/Redux/Action/userLoginAction';
@@ -9,6 +9,7 @@ import { post } from '../../Configuration/Services/API/apiHelper';
 
 const Layouts = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const profile = useSelector(state => state.profile)
     const login = localStorage.getItem('LoginStatus');
     const name = localStorage.getItem('first_name') +" "+ localStorage.getItem('last_name');
@@ -16,6 +17,7 @@ const Layouts = () => {
     const role = atob(localStorage.getItem("role"));
     const [navigation, setNavigation] = useState({});
     const [loadingMenu, setLoadingMenu] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if(login == true) {
@@ -59,7 +61,19 @@ const Layouts = () => {
         }
 
         getNavigation();
-    }, []);
+    }, [role]);
+
+     const handleLogout = async() => {
+        setLoading(true);
+        const response = await post({}, '/logout');
+
+        if(response.data.status == true) {
+            localStorage.clear();
+            navigate('/');
+        }
+
+        setLoading(false);
+    }
 
     // console.log(navigation);
 
@@ -73,6 +87,8 @@ const Layouts = () => {
                                 login={login}
                                 name={name}
                                 profile={profile}
+                                handleLogout={handleLogout}
+                                loading={loading}
                             />
                         </Col>
                     </Row>

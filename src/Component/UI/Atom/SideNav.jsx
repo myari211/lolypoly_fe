@@ -12,7 +12,7 @@ const SideNav = (props) => {
     const items = props.loading == false ? 
         props.data.map(item => (
             {
-                key: item.url,
+                key: item.navigation,
                 label: item.navigation,
                 icon: <Icon component={item.icon} />,
                 ...(item.children && item.children.length > 0 && { children: item.children.map(child => ({

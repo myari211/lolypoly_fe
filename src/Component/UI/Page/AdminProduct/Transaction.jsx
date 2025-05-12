@@ -25,6 +25,8 @@ const Transaction = () => {
         setLoading(false);
     }
 
+    console.log("Transaction", data);
+
     const handleDetails = (id) => {
         window.open('/user/transaction/' + id, '_blank');
     }
@@ -88,15 +90,17 @@ const Transaction = () => {
         
         <>
             {!loading ? (
-                <TableAtom 
-                    data={data}
-                    // form={false}
-                    loading={loading}
-                    columns={columns}
-                    title="Customer"
-                    form={false}
-                    end={false}
-                />
+                <>
+                    <TableAtom 
+                        data={data}
+                        // form={false}
+                        loading={loading}
+                        columns={columns}
+                        title="Customer"
+                        form={false}
+                        end={false}
+                    />
+                </>
             ) : (
                 <>
                     <LoadingImage />

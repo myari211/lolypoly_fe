@@ -14,6 +14,8 @@ import TransactionList from "../../UI/Page/Customer/TransactionList";
 import Customer from "../../UI/Page/AdminProduct/Customer";
 import Transaction from "../../UI/Page/AdminProduct/Transaction";
 import CustomerDetails from "../../UI/Page/AdminProduct/CustomerDetails";
+import PromotionBanner from "../../UI/Page/Product/PromotionBanner";
+import Store from "../../UI/Page/AdminProduct/Store";
 
 
 export const routesConfig = [
@@ -80,6 +82,10 @@ export const routesConfig = [
                 path: "/admin/customer/details/:id",
                 element: <CustomerDetails />
             },
+            {
+                path: "/admin/store",
+                element: <Store />
+            },
 
             //admin product
             {
@@ -89,6 +95,10 @@ export const routesConfig = [
             {
                 path: "/admin_product/product",
                 element: <Product />
+            },
+            {
+                path: "/admin_product/promotion/banner",
+                element: <PromotionBanner />,
             }
         ]
     }

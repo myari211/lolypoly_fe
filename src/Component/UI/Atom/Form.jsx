@@ -53,6 +53,16 @@ const Form = (props) => {
                             </Col>
                         </>
                         );
+                    }
+                    else if (item.type === "number") {
+                        return (
+                        <>
+                            <Col span={item.col} className="mt-1">
+                                <span className="font-small">{item.title}</span>
+                                <Input type="number" name={item.name} value={item.value} onChange={inputChangeHandler} />
+                            </Col>
+                        </>
+                        );
                     } 
                     else if(item.type == "select") {
                         return (
@@ -60,12 +70,17 @@ const Form = (props) => {
                                 <Col span={item.col} className="mt-1">
                                     <span className="font-small">{item.title}</span>
                                     <Select
+                                        filterOption={(input, option) =>
+                                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                                        }
+                                        showSearch
                                         name={item.name}
                                         style={{width: "100%"}}
                                         options={item.list}
                                         // onChange={handleMultiSelectChange("", "", props.setFormData, props.formData)}
                                         onChange={(value) => handleMultiSelectChange(props.setFormData, props.formData)(value, item.name)}
                                         defaultValue={item.value}
+                                        
                                     />
                                 </Col>
                             </>
