@@ -45,9 +45,12 @@ const NavBar = (props) => {
         {
             key: '3',
             label: (
-                <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
+                <Link to="/account/change_password">
                     Change Password
-                </a>
+                </Link>
+                // <a target="_blank" rel="noopener noreferrer" href="">
+                //     Change Password
+                // </a>
             ),
         },
         {

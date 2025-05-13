@@ -8,23 +8,40 @@ const TableAtom = (props) => {
     const [columns, setColumns] = useState(props.columns);
     const [ excelModal, setExcelModal] = useState(false);
 
-    useEffect(() => {
-      if(props.end != false) {
-        setColumns([
-          ...props.columns,
-          {
-            title: "Action",
-            dataIndex: "id",
-            render: (_, {id}) => (
-                <>
-                    <Button type="primary" warning onClick={() => props.handleEdit(id)}>Update</Button>
-                    <Button type="primary" className="ml-1" danger onClick={() => props.handleDelete(id) }>Delete</Button>
-                </>
-            )
-          }
-        ])  
-      }
-    }, []);
+    // useEffect(() => {
+    //   if(props.end != false) {
+    //     setColumns([
+    //       ...props.columns,
+    //       {
+    //         title: "Action",
+    //         dataIndex: "id",
+    //         render: (_, {id}) => (
+    //             <>
+    //                 <Button type="primary" warning onClick={() => props.handleEdit(id)}>Update</Button>
+    //                 <Button type="primary" className="ml-1" danger onClick={() => props.handleDelete(id) }>Delete</Button>
+    //             </>
+    //         )
+    //       }
+    //     ])  
+    //   }
+    // }, []);
+
+    const tableColumns = [
+      ...props.columns,
+    ];
+
+    if (props.end !== false) {
+      tableColumns.push({
+        title: "Action",
+        dataIndex: "id",
+        render: (_, { id }) => (
+          <>
+            <Button type="primary" className="mr-1" onClick={() => props.handleEdit(id)}>Update</Button>
+            <Button type="primary" danger onClick={() => props.handleDelete(id)}>Delete</Button>
+          </>
+        )
+      });
+    }
 
     const handleExcel = () => {
       setExcelModal(true);
@@ -125,7 +142,7 @@ const TableAtom = (props) => {
           <Row className="mt-1">
             <Col span={24}>
               <Table
-                columns={columns}
+                columns={tableColumns}
                 dataSource={props.data}
                 loading={props.loading}
                 scroll={{ x: 1500 }}

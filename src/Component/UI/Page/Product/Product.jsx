@@ -264,6 +264,10 @@ const Product = () => {
         setLoadingButton(false);
     }
 
+    const handleDelete = () => {
+        ModalPopUp("This data cannot be deleted", "info");
+    }
+
     const onSubmit = async() => {
         // console.log(dataExcel);
         setExcelLoading(true)
@@ -315,6 +319,7 @@ const Product = () => {
                                 handleUpdate={handleUpdate}
                                 excel={true}
                                 excelModal={handleModalExcel}
+                                handleDelete={handleDelete}
                             />
 
                             <Form

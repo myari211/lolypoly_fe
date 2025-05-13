@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { get } from '../../../Configuration/Services/API/apiHelper';
+import { get, post } from '../../../Configuration/Services/API/apiHelper';
 import TableAtom from '../../Atom/TableAtom';
 import { Tag } from 'antd';
 import { handleInputChange } from '../../../Configuration/Services/Form/formHelper';
-import { ModalPopUp } from '../../../Configuration/Services/Alert/alertHelper';
+import { ModalPopUp, showErrorToasts } from '../../../Configuration/Services/Alert/alertHelper';
 
 
 const User = () => {
@@ -12,26 +12,10 @@ const User = () => {
     const [formOpen, setFormOpen] = useState(false);
     const [formData, setFormData] = useState({});
     const [roleOption, setRoleOption] = useState({});
+    const [loadingButton, setLoadingButton] = useState(false);
     const [modalStatus, setModalStatus] = useState("create");
 
     useEffect(() => {
-        const getUser = async() => {
-            try {
-                setLoading(true);
-                const response = await get([], "/admin/user/user_list");
-
-                if(response.data.status == true) {
-                    setUserData(response.data.data);
-                }
-
-                setLoading(false);
-            }
-            catch(error) {
-                setLoading(false);
-                console.log(error);
-            }
-        }
-
         getUser();
     }, []);
 
@@ -52,21 +36,6 @@ const User = () => {
         getRoleOption();
     }, []);
 
-    const data = !loading ? userData.map(item => {
-        return {
-            id: item.id,
-            key: item.id,
-            first_name: item.first_name,
-            last_name: item.last_name,
-            role_name: item.roles.map((data) => data.name),
-            // navigation: item.navigation.map(child => child.navigation).join(', ')
-        }
-    })
-    : 
-    [];
-
-    console.log("data", userData);
-
     const columns = [
         {
             title: "First Name",
@@ -79,27 +48,62 @@ const User = () => {
             key: "last_name",
         },
         {
-            title: "Role",
-            dataIndex: "role_name",
-            key: "role_name",
-            render: (_, { role_name }) => {
-                let color;
-            
-                if (role_name == "admin") {
-                  color = "volcano";
-                } else if (role_name == "Super-Admin") {
-                  color = "geekblue";
-                } else {
-                  color = "green"; 
-                }
-            
-                return (
-                  <Tag key={role_name} color={color}>
-                    {role_name}
-                  </Tag>
-                );
-              },
+            title: "Email",
+            dataIndex: "email",
+            key: "email",
         },
+        {
+            title: "Role",
+            render: (_, item) => {
+                return item.roles?.map(child => {
+                    let color;
+
+                    switch (child.name) {
+                        case "admin":
+                            color = "volcano";
+                            break;
+                        case "Super-Admin":
+                            color = "geekblue";
+                            break;
+                        default:
+                            color = "green";
+                    }
+
+                    return (
+                        <Tag key={child.name} color={color}>
+                            {child.name}
+                        </Tag>
+                    );
+                });
+            }
+        },
+        {
+            title: "Status",
+            render: (_, item) => {
+                let color;
+                let text;
+
+                switch(item.status) {
+                    case 0:
+                        color = "volcano";
+                        text = "Deactivated";
+                        break;
+                    case 1:
+                        color = "green";
+                        text = "Active";
+                        break
+                    default:
+                        color = "primary";
+                        text = "unknown";
+                }
+
+                return (
+                    <Tag key={item.id} color={color}>
+                        {text}
+                    </Tag>
+                )
+            }
+        }
     ];
 
     const form = [
@@ -127,12 +131,47 @@ const User = () => {
         {
             title: "Role",
             name: "role",
-            value: "role",
+            value: formData?.role,
             col: 24,
             type: "select",
             list: roleOption
         },
+        {
+            title: "Status",
+            name: "status",
+            value: formData?.status,
+            col:24,
+            type: "select",
+            list: [
+                {
+                    value: 1,
+                    label: "Active",
+                },
+                {
+                    value: 0,
+                    label: "Deactive",
+                }
+            ]
+        }
     ];
+
+    const getUser = async() => {
+        try {
+            setLoading(true);
+            const response = await get([], "/admin/user/user_list");
+
+            if(response.data.status == true) {
+                setUserData(response.data.data);
+            }
+
+            setLoading(false);
+        }
+        catch(error) {
+            setLoading(false);
+            console.log(error);
+        }
+    }
+
 
     const openModal = () => {
         setModalStatus("create");
@@ -144,38 +183,89 @@ const User = () => {
         setFormOpen(false);
     }
 
-    const handleEdit = (id) => {
-        // return ModalPopUp(id, "success");
-        console.log("id", id);
-        setModalStatus("update");
+    const handleCreate = async() => {
+        setLoadingButton(true);
 
-        const dataInit = userData;
+        try {
+            const createUser = await post(formData, "/admin/user/create");
 
-        console.log("dataInit", dataInit);
-
-        // console.log("Type of userData:", Array.isArray(userData));
-        // // console.log("UserData", userData.find(item => item.id == id));
-        // console.log("userDataReal", userData);
-        // console.log("userData", userData[0]);
-
-        // console.log("filter", filter);
-
-        // setFormData({
-        //     first_name: filterData.first_name,
-        //     last_name: filterData.last_name,
-        //     email: filterData.email,
-        // });
-
-        // setFormOpen(true);
+            if(createUser.data.status == true) {
+                setFormData({});
+                closeModal();
+                getUser();
+                ModalPopUp("Data Created", "success");
+            }
+            else {
+                showErrorToasts(createUser.data.message);
+            }
+        }
+        catch(error) {
+            showErrorToasts(error);
+        }
+        setLoadingButton(false);
     }
 
-    console.log("dataEnd", userData);
+    const handleUpdateButton = (id) => {
+        setModalStatus("update");
+        const selectedItems = userData.find(item => item.id == id);
+
+        setFormData({
+            id: selectedItems.id,
+            first_name: selectedItems.first_name,
+            last_name: selectedItems.last_name,
+            email: selectedItems.email,
+            role: selectedItems.roles.map(child => child.id),
+            status: selectedItems.status,
+        });
+
+        setFormOpen(true);
+    }
+
+    const handleUpdate = async() => {
+        setLoadingButton(true);
+
+        try {
+            const updateUser = await post(formData, "/admin/user/edit/" + formData.id);
+
+            if(updateUser.data.status == true) {
+                setFormData({});
+                getUser();
+                closeModal();
+                ModalPopUp("Data Updated", "success");
+            }
+            else {
+                showErrorToasts(updateUser.data.message);
+            }
+        }
+        catch(error) {
+            showErrorToasts(error);
+        }
+
+        setLoadingButton(false);
+    }
+
+    const handleDelete = async (id) => {
+        try {
+            const deleteUser = await post({}, '/admin/user/delete/' + id);
+
+            if(deleteUser.data.status == true) {
+                getUser();
+                ModalPopUp("Data Deleted", "success");
+            }
+            else {
+                showErrorToasts(deleteUser.data.message);
+            }
+        }
+        catch(error) {
+            showErrorToasts(error);
+        }
+    } 
     
     return(
         <>
             <TableAtom
                 columns={columns}
-                data={data}
+                data={userData}
                 loading={loading}
                 isModal={formOpen}
                 openModal={openModal}
@@ -185,7 +275,11 @@ const User = () => {
                 formData={formData}
                 setFormData={setFormData}
                 modalStatus={modalStatus}
-                handleEdit={handleEdit}
+                handleEdit={handleUpdateButton}
+                loadingButton={loadingButton}
+                onSubmit={handleCreate}
+                handleUpdate={handleUpdate}
+                handleDelete={handleDelete}
             />
         </>
     )

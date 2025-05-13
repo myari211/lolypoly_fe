@@ -35,11 +35,11 @@ const Product = ({ props }) => {
                     <Row>
                         <Col span={24}> 
                             <Flex align="center" justify="space-between">    
-                                <p className="mr-1" style={{ fontWeight: "600", color: "#4395d1", fontSize: "16px"}}>{props.discount_price != 0 ? formatRupiah(props.discount_price) : formatRupiah(props.price)}</p>
-                                {props.discount_price != 0 && (<Text delete style={{ fontSize: "10px"}}>{formatRupiah(props.price)}</Text>)}
+                                <p className="mr-1" style={{ fontWeight: "600", color: "#4395d1", fontSize: "16px"}}>{(props.discount_price != 0 || props.discount_price != null)? formatRupiah(props.discount_price) : formatRupiah(props.price)}</p>
+                                {(props.discount_price != 0 || props.discount_price != null) && (<Text delete style={{ fontSize: "10px"}}>{formatRupiah(props.price)}</Text>)}
                             </Flex>
                             {
-                                    props.discount_percentage != 0 && (
+                                    (props.discount_percentage != 0 || props.discount_percentage != 0) && (
                                         <Tag color="#108ee9">
                                             Disc {props.discount_percentage}% 
                                         </Tag>

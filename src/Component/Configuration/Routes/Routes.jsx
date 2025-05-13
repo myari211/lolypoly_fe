@@ -16,6 +16,7 @@ import Transaction from "../../UI/Page/AdminProduct/Transaction";
 import CustomerDetails from "../../UI/Page/AdminProduct/CustomerDetails";
 import PromotionBanner from "../../UI/Page/Product/PromotionBanner";
 import Store from "../../UI/Page/AdminProduct/Store";
+import ChangePassword from "../../UI/Page/ChangePassword";
 
 
 export const routesConfig = [
@@ -99,6 +100,12 @@ export const routesConfig = [
             {
                 path: "/admin_product/promotion/banner",
                 element: <PromotionBanner />,
+            },
+
+            //global
+            {
+                path: "/account/change_password",
+                element: <ChangePassword />,
             }
         ]
     }
